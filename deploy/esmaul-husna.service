@@ -1,0 +1,30 @@
+# systemd unit for the Esmaü'l-Hüsna app. Installed to /etc/systemd/system/ by deploy/install.sh.
+[Unit]
+Description=Esmaü'l-Hüsna Kılavuzu (Node.js)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=esmaul
+Group=esmaul
+WorkingDirectory=/opt/esmaul-husna
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOST=127.0.0.1
+ExecStart=/usr/bin/node /opt/esmaul-husna/server.mjs
+Restart=on-failure
+RestartSec=3
+
+# Hardening: the app only needs to read its code and write data/progress.json.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/esmaul-husna/data
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

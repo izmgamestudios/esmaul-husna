@@ -43,6 +43,21 @@ Dış bağlantılar üçüncü taraf sitelere gider. Ayet ve hadis bilgilerini h
 - **Haftalık tema:** Kılavuzdaki 4 haftalık tema sırayla döner. Temanın rozetlerine ait tüm isimler aynı hafta (Pazartesi–Pazar) içinde tamamlanırsa +100 XP.
 - **Seviye:** XP eşiklerine göre Talip, Salik, Arif, Muhsin, Sadık.
 
+## Sunucuya kurulum (Hetzner / Ubuntu)
+
+Ön koşul: `teknodoz-esmaulhusna-ortakofis.org` kaydının A (ve varsa AAAA) kaydı sunucuya işaret etmeli. Node.js 20+ kurulu olmalı.
+
+    sudo bash deploy/install.sh
+
+Script idempotenttir: tekrar çalıştırmak kodu günceller ve servisi yeniden başlatır. Oluşturduğu parçalar:
+
+- `/opt/esmaul-husna`: kod (git klonu, `data/` dizini hariç)
+- `esmaul-husna.service`: systemd servisi, `127.0.0.1:3000` üzerinde çalışır, `esmaul` kullanıcısıyla sınırlı yetkiyle
+- nginx sitesi: alan adını `127.0.0.1:3000`'e yönlendirir
+- Let's Encrypt sertifikası (certbot)
+
+CloudPanel kullanılan sunucularda nginx vhost'ları CloudPanel tarafından yönetilir. Orada alan adını CloudPanel'de bir site olarak ekleyip reverse proxy'yi `http://127.0.0.1:3000` olarak ayarlamak daha sağlıklıdır.
+
 ## Bilinen sınırlar (MVP)
 
 - Her isim için yalnızca son tamamlanma tarihi tutulur. Bir ismi bir hafta içinde tamamlayıp sonra geri alırsanız, o haftaki bonus ve rozet hesabı bu değişikliğe göre yeniden yapılır.
