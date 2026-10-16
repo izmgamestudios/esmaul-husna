@@ -147,3 +147,7 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Esmaul Husna app: local progress data
+data/progress.json
+data/progress.json.tmp

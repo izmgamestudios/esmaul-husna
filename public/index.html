@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Esmaü'l-Hüsna Kılavuzu</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Esmaü'l-Hüsna Kılavuzu</h1>
+    <p class="subtitle">Her ismi yaşa, puan kazan, rozet topla.</p>
+  </header>
+  <main>
+    <section id="stats" aria-label="İlerleme"></section>
+    <section aria-labelledby="badges-title">
+      <h2 id="badges-title">Rozetler</h2>
+      <div id="badges" class="badges"></div>
+    </section>
+    <section aria-labelledby="names-title">
+      <h2 id="names-title">İsimler</h2>
+      <nav id="letters" aria-label="Harfe göre filtrele"></nav>
+      <ul id="names" class="names"></ul>
+    </section>
+    <p id="error" role="alert" class="error" hidden></p>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

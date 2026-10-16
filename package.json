@@ -1,0 +1,12 @@
+{
+  "name": "esmaul-husna-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Esmaü'l-Hüsna kılavuzu ve oyunlaştırılmış takip uygulaması (Node.js, bağımlılıksız)",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/parse.test.mjs test/gamification.test.mjs"
+  }
+}
