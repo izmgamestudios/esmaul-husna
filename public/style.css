@@ -99,3 +99,9 @@ main { max-width: 960px; margin: 0 auto; padding: 1rem; }
   .sidebar.open { transform: none; box-shadow: 0 0 24px rgba(0, 0, 0, 0.3); }
   .menu-toggle { display: inline-flex; }
 }
+
+.daily-box { margin-top: 0.75rem; display: grid; gap: 0.5rem; }
+.daily { border-color: var(--accent, var(--line)); }
+.daily.done { opacity: 0.85; }
+.daily .btn { margin-top: 0.5rem; }
+.notice.warn { border-style: solid; }

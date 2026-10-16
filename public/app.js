@@ -69,6 +69,24 @@ function renderWeekly(w) {
   );
 }
 
+function renderDaily(d) {
+  const nodes = [];
+  if (d.name) {
+    const done = d.name.done;
+    nodes.push(el('div', { class: done ? 'stat daily done' : 'stat daily' },
+      el('div', { class: 'label' }, 'Günün ismi'),
+      el('div', { class: 'value' }, d.name.name),
+      el('div', { class: 'meta' }, done ? 'Bugün tamamlandı. Yarın yeni bir isim seni bekliyor.' : 'Bugünkü hedefin: bu ismin görevini yap.'),
+      done ? null : el('button', { type: 'button', class: 'btn', 'data-name': d.name.name }, 'Tamamla (+10 XP)'),
+    ));
+  }
+  if (d.streakAtRisk) nodes.push(el('p', { class: 'notice warn', role: 'status' }, 'Serin bugün tamamlanmazsa gece yarısı sıfırlanır. Bir isim tamamla.'));
+  if (d.nextBadge && d.nextBadge.remaining > 0) {
+    nodes.push(el('p', { class: 'notice' }, `Sıradaki rozet: ${d.nextBadge.name}. Son 7 günde ${d.nextBadge.remaining} isim daha tamamla.`));
+  }
+  return el('div', { class: 'daily-box' }, ...nodes);
+}
+
 function renderStats() {
   const s = state.stats;
   const next = s.nextLevel
@@ -85,6 +103,7 @@ function renderStats() {
       el('div', { class: 'stat' }, el('div', { class: 'label' }, 'Tamamlanan'), el('div', { class: 'value' }, `${s.completedCount} / ${s.totalNames}`), bar),
     ),
     el('p', { class: 'subtitle' }, next),
+    renderDaily(s.daily),
     renderWeekly(s.weekly),
   );
 }
@@ -180,10 +199,13 @@ async function toggle(name) {
 
 /* ---------- Events ---------- */
 
-document.getElementById('name-list').addEventListener('click', (event) => {
+function onToggleClick(event) {
   const btn = event.target.closest('button[data-name]');
   if (btn) toggle(btn.dataset.name);
-});
+}
+
+document.getElementById('name-list').addEventListener('click', onToggleClick);
+document.getElementById('stats').addEventListener('click', onToggleClick);
 
 document.getElementById('letters').addEventListener('click', (event) => {
   const btn = event.target.closest('button[data-letter]');

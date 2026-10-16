@@ -9,6 +9,8 @@ Esmaü'l-Hüsna'yı anlamlandıran, her gün yaşatan ve oyunlaştırılmış bi
 - 98 ismin Arapça yazılışı, anlamı ve günlük görevi
 - XP, seri (streak), seviye ve 7 kategori rozeti
 - Açık ve koyu tema (tercih tarayıcıda saklanır, yoksa sistem ayarı kullanılır)
+- **Günün ismi:** her gün tarihe göre sabit seçilen bir isim, tek tıkla tamamlanır
+- **Seri uyarısı** (seri gece yarısı bozulacaksa) ve **sıradaki rozet ipucu**
 - Kenar menü (mobilde açılır menü)
 - Kaynakça bölümü: Kur'an, hadis ve resmi dini kaynaklara dış bağlantılar
 - Krediler: e-posta, LinkedIn, arama ve WhatsApp bağlantıları
