@@ -36,11 +36,17 @@ Esmaü'l-Hüsna'yı anlamlandıran, her gün yaşatan ve oyunlaştırılmış bi
 
 Dış bağlantılar üçüncü taraf sitelere gider. Ayet ve hadis bilgilerini her zaman birincil kaynaktan doğrulayın.
 
+## Oyun kuralları
+
+- **XP:** Tamamlanan her isim 10 XP. Her tam 7 günlük seri +50 XP. Haftalık tema bonusu +100 XP.
+- **Rozet:** Aynı kategoriden 7 gün içinde 3 isim tamamlanınca kazanılır. Kazanıldığı gün gösterilir.
+- **Haftalık tema:** Kılavuzdaki 4 haftalık tema sırayla döner. Temanın rozetlerine ait tüm isimler aynı hafta (Pazartesi–Pazar) içinde tamamlanırsa +100 XP.
+- **Seviye:** XP eşiklerine göre Talip, Salik, Arif, Muhsin, Sadık.
+
 ## Bilinen sınırlar (MVP)
 
+- Her isim için yalnızca son tamamlanma tarihi tutulur. Bir ismi bir hafta içinde tamamlayıp sonra geri alırsanız, o haftaki bonus ve rozet hesabı bu değişikliğe göre yeniden yapılır.
 - İlerleme tek kullanıcılıdır. Çok kullanıcılı sürüm için Supabase (PostgreSQL + RLS) önerilir.
-- Rozet kuralı basitleştirildi: kategoriden 3 isim tamamlanınca kazanılır. Kılavuzdaki "7 gün içinde" koşulu henüz uygulanmadı.
-- Haftalık tema bonusu (+100 XP) henüz hesaplanmıyor.
 - Sunucu varsayılan olarak yalnızca `127.0.0.1` üzerinde dinler. Dışarı açmadan önce kimlik doğrulama eklenmelidir.
 
 ## Geliştirici

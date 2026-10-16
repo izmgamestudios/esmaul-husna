@@ -54,6 +54,21 @@ function setMenu(open) {
 
 /* ---------- Rendering ---------- */
 
+function renderWeekly(w) {
+  if (!w.theme) return el('p', { class: 'subtitle' }, '');
+  const status = w.bonusEarned
+    ? `Bu hafta bonus kazanıldı (+${w.bonusPerWeek} XP)`
+    : `Haftalık bonus: temanın tüm isimlerini bu hafta tamamla (+${w.bonusPerWeek} XP)`;
+  const weekBar = el('div', { class: 'progress', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(w.required), 'aria-valuenow': String(w.done) },
+    el('span', { style: `width:${w.required ? Math.round((w.done / w.required) * 100) : 0}%` }));
+  return el('div', { class: 'stat weekly' },
+    el('div', { class: 'label' }, `Bu haftanın teması (${w.theme.week}. hafta)`),
+    el('div', { class: 'value' }, `${w.theme.title}: ${w.done} / ${w.required}`),
+    weekBar,
+    el('div', { class: 'meta' }, status),
+  );
+}
+
 function renderStats() {
   const s = state.stats;
   const next = s.nextLevel
@@ -70,6 +85,7 @@ function renderStats() {
       el('div', { class: 'stat' }, el('div', { class: 'label' }, 'Tamamlanan'), el('div', { class: 'value' }, `${s.completedCount} / ${s.totalNames}`), bar),
     ),
     el('p', { class: 'subtitle' }, next),
+    renderWeekly(s.weekly),
   );
 }
 
@@ -78,6 +94,7 @@ function renderBadges() {
     el('div', { class: b.earned ? 'badge earned' : 'badge' },
       el('div', { class: 'title' }, b.earned ? `🏅 ${b.name}` : b.name),
       el('div', { class: 'meta' }, `${b.category} · ${b.count}/${b.total}`),
+      b.earnedOn ? el('div', { class: 'meta' }, `Kazanıldı: ${b.earnedOn}`) : null,
     )));
 }
 

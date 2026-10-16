@@ -5,7 +5,7 @@ import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseKilavuz, parseBadges } from './lib/parse.mjs';
+import { parseKilavuz, parseBadges, parseThemes } from './lib/parse.mjs';
 import { computeStats, todayIso } from './lib/gamification.mjs';
 import { validateSources } from './lib/sources.mjs';
 
@@ -38,6 +38,7 @@ const CSP = [
 const md = await readFile(path.join(DATA_DIR, 'kilavuz.md'), 'utf8');
 const names = parseKilavuz(md);
 const badges = parseBadges(md);
+const themes = parseThemes(md);
 const sources = validateSources(JSON.parse(await readFile(path.join(DATA_DIR, 'sources.json'), 'utf8')));
 const knownNames = new Set(names.map((n) => n.name));
 
@@ -79,6 +80,7 @@ function snapshot(progress) {
     stats: computeStats({
       names,
       badges,
+      themes,
       completed: progress.completed,
       today: todayIso(TZ),
     }),

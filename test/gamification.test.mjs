@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { addDays, currentStreak, computeStats, todayIso } from '../lib/gamification.mjs';
+import { addDays, currentStreak, computeStats, todayIso, badgeStatus, weeklyStatus, weekIndex } from '../lib/gamification.mjs';
 
 const TODAY = '2026-10-16';
 
@@ -44,4 +44,30 @@ test('badge is earned at three completed members', () => {
   const three = computeStats({ names: [], badges, completed: { a: TODAY, b: TODAY, c: TODAY }, today: TODAY });
   assert.equal(two.badges[0].earned, false);
   assert.equal(three.badges[0].earned, true);
+});
+
+test('badge needs three names inside a 7-day window, not just any three', () => {
+  const badge = { name: 'T', category: 'C', names: ['a', 'b', 'c'] };
+  const inWindow = badgeStatus(badge, { a: '2026-10-10', b: '2026-10-13', c: '2026-10-16' });
+  const spread = badgeStatus(badge, { a: '2026-10-01', b: '2026-10-09', c: '2026-10-16' });
+  assert.equal(inWindow.earned, true);
+  assert.equal(inWindow.earnedOn, '2026-10-16');
+  assert.equal(spread.earned, false);
+});
+
+test('weekly bonus is awarded when all names of the theme are done in that week', () => {
+  const badges = [{ name: 'T', category: 'C', names: ['a', 'b'] }];
+  const themes = [{ week: 1, title: 'x', badges: ['T'] }, { week: 2, title: 'y', badges: ['T'] }];
+  const done = weeklyStatus({ themes, badges, completed: { a: '2026-10-12', b: '2026-10-13' }, today: TODAY });
+  const partial = weeklyStatus({ themes, badges, completed: { a: '2026-10-12' }, today: TODAY });
+  assert.equal(done.bonusEarned, true);
+  assert.equal(done.bonusWeeks, 1);
+  assert.equal(done.bonusXp, 100);
+  assert.equal(partial.bonusEarned, false);
+  assert.equal(partial.bonusXp, 0);
+});
+
+test('weekIndex groups Monday to Sunday together', () => {
+  assert.equal(weekIndex('2026-10-12'), weekIndex('2026-10-18'));
+  assert.notEqual(weekIndex('2026-10-11'), weekIndex('2026-10-12'));
 });

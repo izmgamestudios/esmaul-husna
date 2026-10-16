@@ -60,6 +60,7 @@ main { max-width: 960px; margin: 0 auto; padding: 1rem; }
 .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0.75rem; }
 .stat .label { color: var(--muted); font-size: 0.85rem; }
 .stat .value { font-size: 1.25rem; font-weight: 600; }
+.weekly { margin-top: 0.75rem; grid-column: 1 / -1; }
 .progress { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 0.5rem; }
 .progress > span { display: block; height: 100%; background: var(--accent); }
 

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { parseKilavuz, parseBadges } from '../lib/parse.mjs';
+import { parseKilavuz, parseBadges, parseThemes } from '../lib/parse.mjs';
 
 const md = await readFile(new URL('../data/kilavuz.md', import.meta.url), 'utf8');
 
@@ -26,4 +26,12 @@ test('every badge member exists in the name list', () => {
   for (const b of parseBadges(md)) {
     for (const member of b.names) assert.ok(names.has(member), `${b.name}: ${member}`);
   }
+});
+
+test('parses four weekly themes that reference existing badges', () => {
+  const themes = parseThemes(md);
+  const badgeNames = new Set(parseBadges(md).map((b) => b.name));
+  assert.equal(themes.length, 4);
+  assert.deepEqual(themes.map((t) => t.week), [1, 2, 3, 4]);
+  for (const t of themes) for (const b of t.badges) assert.ok(badgeNames.has(b), `${t.title}: ${b}`);
 });
