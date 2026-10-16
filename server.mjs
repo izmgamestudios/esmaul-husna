@@ -23,6 +23,8 @@ const STATIC_FILES = {
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/theme.js': ['theme.js', 'text/javascript; charset=utf-8'],
   '/logo.png': ['logo.png', 'image/png'],
+  '/teknodoz-projects.js': ['teknodoz-projects.js', 'text/javascript; charset=utf-8'],
+  '/teknodoz-projects.css': ['teknodoz-projects.css', 'text/css; charset=utf-8'],
 };
 
 const CSP = [
@@ -30,7 +32,7 @@ const CSP = [
   "script-src 'self'",
   "style-src 'self'",
   "img-src 'self' data:",
-  "connect-src 'self'",
+  "connect-src 'self' https://teknodoz-projects.ortakofis.org",
   "base-uri 'none'",
   "frame-ancestors 'none'",
 ].join('; ');
