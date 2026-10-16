@@ -56,6 +56,14 @@ Script idempotenttir: tekrar çalıştırmak kodu günceller ve servisi yeniden 
 - nginx sitesi: alan adını `127.0.0.1:3000`'e yönlendirir
 - Let's Encrypt sertifikası (certbot)
 
+### Windows'tan güncelleme (PowerShell)
+
+Kurulum bir kez yapıldıktan sonra yeni sürümü şu komutla yayınlayabilirsiniz:
+
+    .\deploy\deploy.ps1 -Server <sunucu-ip> -User root -KeyPath "$HOME\.ssh\id_ed25519"
+
+Script `main` dalının son sürümünü çeker, servisi yeniden başlatır ve sağlık kontrolü yapar. Özel anahtar repoya eklenmez.
+
 CloudPanel kullanılan sunucularda nginx vhost'ları CloudPanel tarafından yönetilir. Orada alan adını CloudPanel'de bir site olarak ekleyip reverse proxy'yi `http://127.0.0.1:3000` olarak ayarlamak daha sağlıklıdır.
 
 ## Bilinen sınırlar (MVP)
