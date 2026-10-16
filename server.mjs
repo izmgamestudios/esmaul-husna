@@ -1,17 +1,17 @@
 // Esmaü'l-Hüsna server: serves the static UI and a small JSON API.
 // Zero dependencies. Progress is stored in data/progress.json.
 import http from 'node:http';
-import { readFile, writeFile, rename, mkdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseKilavuz, parseBadges, parseThemes } from './lib/parse.mjs';
 import { computeStats, todayIso } from './lib/gamification.mjs';
 import { validateSources } from './lib/sources.mjs';
+import { createStoreFromEnv } from './lib/store.mjs';
+import { freezeStatus } from './lib/freeze.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(ROOT, 'data');
-const PROGRESS_FILE = path.join(DATA_DIR, 'progress.json');
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 const TZ = 'Europe/Istanbul';
@@ -42,49 +42,50 @@ const themes = parseThemes(md);
 const sources = validateSources(JSON.parse(await readFile(path.join(DATA_DIR, 'sources.json'), 'utf8')));
 const knownNames = new Set(names.map((n) => n.name));
 
+const store = await createStoreFromEnv(process.env, DATA_DIR);
+
 /** Keep only known names and valid dates, so stale or tampered data is dropped. */
-function sanitize(completed) {
-  const out = {};
-  if (completed && typeof completed === 'object') {
-    for (const [name, date] of Object.entries(completed)) {
-      if (knownNames.has(name) && /^\d{4}-\d{2}-\d{2}$/.test(date)) out[name] = date;
+function sanitize(raw) {
+  const isDate = (d) => typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d);
+  const completed = {};
+  if (raw?.completed && typeof raw.completed === 'object') {
+    for (const [name, date] of Object.entries(raw.completed)) {
+      if (knownNames.has(name) && isDate(date)) completed[name] = date;
     }
   }
-  return out;
+  const freezes = Array.isArray(raw?.freezes) ? [...new Set(raw.freezes.filter(isDate))].sort() : [];
+  return { completed, freezes };
 }
 
-async function loadProgress() {
-  if (!existsSync(PROGRESS_FILE)) return { completed: {} };
-  try {
-    const parsed = JSON.parse(await readFile(PROGRESS_FILE, 'utf8'));
-    return { completed: sanitize(parsed.completed) };
-  } catch {
-    return { completed: {} };
-  }
-}
+const loadProgress = async () => sanitize(await store.loadProgress());
 
-/** Write to a temp file, then rename, so a crash never leaves a half-written file. */
-async function saveProgress(progress) {
-  await mkdir(DATA_DIR, { recursive: true });
-  const tmp = `${PROGRESS_FILE}.tmp`;
-  await writeFile(tmp, JSON.stringify(progress, null, 2), 'utf8');
-  await rename(tmp, PROGRESS_FILE);
+/** One writer at a time: Drive read-modify-write must not interleave. */
+let queue = Promise.resolve();
+function exclusive(task) {
+  const run = queue.then(task, task);
+  queue = run.catch(() => {});
+  return run;
 }
 
 function snapshot(progress) {
-  return {
-    names,
-    badges,
-    sources,
+  const stats = computeStats({
+    names, badges, themes,
     completed: progress.completed,
-    stats: computeStats({
-      names,
-      badges,
-      themes,
-      completed: progress.completed,
-      today: todayIso(TZ),
-    }),
-  };
+    freezes: progress.freezes,
+    today: todayIso(TZ),
+  });
+  return { names, badges, sources, completed: progress.completed, stats };
+}
+
+/** Persist progress, then best-effort log + report (a failed log never loses the user's action). */
+async function persist(progress, event) {
+  await store.saveProgress(progress);
+  const snap = snapshot(progress);
+  const today = todayIso(TZ);
+  store.appendActivity({ timestamp: new Date().toISOString(), date: today, ...event })
+    .then(() => store.saveReport({ updatedAt: new Date().toISOString(), xp: snap.stats.xp, streak: snap.stats.streak, level: snap.stats.level.title, completedCount: snap.stats.completedCount, weekly: snap.stats.daily.summary }))
+    .catch((err) => console.error('Rapor yazılamadı:', err.message));
+  return snap;
 }
 
 function send(res, status, body, headers = {}) {
@@ -149,14 +150,31 @@ const server = http.createServer(async (req, res) => {
       if (typeof name !== 'string' || !knownNames.has(name)) {
         return sendJson(res, 400, { error: 'Bilinmeyen isim' });
       }
-      const progress = await loadProgress();
-      if (progress.completed[name]) {
-        delete progress.completed[name];
-      } else {
-        progress.completed[name] = todayIso(TZ);
-      }
-      await saveProgress(progress);
-      return sendJson(res, 200, snapshot(progress));
+      const snap = await exclusive(async () => {
+        const progress = await loadProgress();
+        let action = 'complete';
+        if (progress.completed[name]) {
+          delete progress.completed[name];
+          action = 'undo';
+        } else {
+          progress.completed[name] = todayIso(TZ);
+        }
+        return persist(progress, { name, action });
+      });
+      return sendJson(res, 200, snap);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/freeze') {
+      const result = await exclusive(async () => {
+        const progress = await loadProgress();
+        const today = todayIso(TZ);
+        const status = freezeStatus(new Set(Object.values(progress.completed)), progress.freezes, today);
+        if (!status.canUse) return null;
+        progress.freezes.push(status.target);
+        return persist(progress, { name: status.target, action: 'freeze' });
+      });
+      if (!result) return sendJson(res, 409, { error: 'Seri koruyucu şu an kullanılamaz' });
+      return sendJson(res, 200, result);
     }
 
     return sendJson(res, 404, { error: 'Bulunamadı' });
@@ -168,5 +186,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`Esmaü'l-Hüsna uygulaması: http://${HOST}:${PORT}`);
+  console.log(`Depolama: ${store.kind}`);
   console.log(`${names.length} isim, ${badges.length} rozet, ${sources.length} kaynak yüklendi.`);
 });

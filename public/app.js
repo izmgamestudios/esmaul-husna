@@ -69,6 +69,27 @@ function renderWeekly(w) {
   );
 }
 
+function renderSummary(w) {
+  const sign = w.delta > 0 ? `+${w.delta}` : String(w.delta);
+  const compare = w.prevCount === 0 && w.count === 0 ? 'Bu hafta henüz isim tamamlamadın.' : `Geçen haftaya göre ${sign} isim.`;
+  return el('div', { class: 'stat' },
+    el('div', { class: 'label' }, `Haftalık özet (${w.weekStart} haftası)`),
+    el('div', { class: 'value' }, `${w.count} isim · ${w.activeDays} aktif gün · ${w.xp} XP`),
+    el('div', { class: 'meta' }, compare),
+    w.bestDay ? el('div', { class: 'meta' }, `En verimli gün: ${w.bestDay.date} (${w.bestDay.count} isim)`) : null,
+  );
+}
+
+async function useFreeze() {
+  try {
+    Object.assign(state, await api('/api/freeze', { method: 'POST' }));
+    showError('');
+    render();
+  } catch (err) {
+    showError(`Seri koruyucu kullanılamadı: ${err.message}`);
+  }
+}
+
 function renderDaily(d) {
   const nodes = [];
   if (d.name) {
@@ -80,6 +101,12 @@ function renderDaily(d) {
       done ? null : el('button', { type: 'button', class: 'btn', 'data-name': d.name.name }, 'Tamamla (+10 XP)'),
     ));
   }
+  if (d.freeze.canUse) {
+    nodes.push(el('div', { class: 'notice warn', role: 'status' },
+      el('span', {}, `Dün hiç isim tamamlamadın, serin kopmak üzere. Bu ay ${d.freeze.available} seri koruyucu hakkın var. `),
+      el('button', { type: 'button', class: 'btn', id: 'use-freeze' }, 'Seri koruyucu kullan')));
+  }
+  nodes.push(renderSummary(d.summary));
   if (d.streakAtRisk) nodes.push(el('p', { class: 'notice warn', role: 'status' }, 'Serin bugün tamamlanmazsa gece yarısı sıfırlanır. Bir isim tamamla.'));
   if (d.nextBadge && d.nextBadge.remaining > 0) {
     nodes.push(el('p', { class: 'notice' }, `Sıradaki rozet: ${d.nextBadge.name}. Son 7 günde ${d.nextBadge.remaining} isim daha tamamla.`));
@@ -200,6 +227,7 @@ async function toggle(name) {
 /* ---------- Events ---------- */
 
 function onToggleClick(event) {
+  if (event.target.closest('#use-freeze')) return useFreeze();
   const btn = event.target.closest('button[data-name]');
   if (btn) toggle(btn.dataset.name);
 }

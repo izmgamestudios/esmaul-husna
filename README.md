@@ -10,6 +10,7 @@ Esmaü'l-Hüsna'yı anlamlandıran, her gün yaşatan ve oyunlaştırılmış bi
 - XP, seri (streak), seviye ve 7 kategori rozeti
 - Açık ve koyu tema (tercih tarayıcıda saklanır, yoksa sistem ayarı kullanılır)
 - **Günün ismi:** her gün tarihe göre sabit seçilen bir isim, tek tıkla tamamlanır
+- **Seri koruyucu** (ayda 1 hak, dünkü boş günü affeder) ve **haftalık özet**
 - **Seri uyarısı** (seri gece yarısı bozulacaksa) ve **sıradaki rozet ipucu**
 - Kenar menü (mobilde açılır menü)
 - Kaynakça bölümü: Kur'an, hadis ve resmi dini kaynaklara dış bağlantılar
@@ -26,6 +27,7 @@ Esmaü'l-Hüsna'yı anlamlandıran, her gün yaşatan ve oyunlaştırılmış bi
 | Metot | Yol | Açıklama |
 |---|---|---|
 | GET | `/api/state` | İsimler, rozetler, kaynaklar, tamamlananlar ve istatistikler |
+| POST | `/api/freeze` | Dünü seri koruyucuyla kapatır (409: kullanılamaz) |
 | POST | `/api/toggle` | Body: `{"name": "El-Adl"}`. Tamamlanmayı açar veya kapatır |
 
 ## Veri dosyaları
@@ -33,6 +35,30 @@ Esmaü'l-Hüsna'yı anlamlandıran, her gün yaşatan ve oyunlaştırılmış bi
 - `data/kilavuz.md`: isim tabloları, rozetler, ayet ve hadis dayanakları
 - `data/sources.json`: kaynakça. Yalnızca `https` bağlantılar kabul edilir (`lib/sources.mjs` doğrular)
 - `data/progress.json`: kullanıcı ilerlemesi (git'e eklenmez)
+
+## Depolama: Google Drive veritabanı
+
+Varsayılan depolama yerel `data/` klasörüdür. `STORAGE=drive` ile ilerleme bir Google Drive klasöründe tutulur:
+
+| Dosya | Biçim | İçerik |
+|---|---|---|
+| `progress.json` | JSON | Tamamlanan isimler ve seri koruyucu günleri (asıl veri) |
+| `activity.csv` | CSV | Her tamamla/geri al/koruyucu olayı (Sheets veya Excel'de açılır) |
+| `summary.json` | JSON | XP, seri, seviye ve haftalık özet (her kayıtta güncellenir) |
+
+Kurulum (bir kez):
+
+1. Google Cloud'da bir **servis hesabı** oluşturup Drive API'yi etkinleştirin, JSON anahtarı indirin.
+2. Drive klasörünü servis hesabının e-postasıyla **Düzenleyici** olarak paylaşın.
+3. Sunucuda `/etc/esmaul-husna/sa.json` olarak kaydedin (`chmod 600`) ve `/etc/esmaul-husna.env` oluşturun:
+
+        STORAGE=drive
+        DRIVE_FOLDER_ID=1y3mr7xnHCyRt_MlQKih2gqjCy_-s0VC6
+        GOOGLE_SERVICE_ACCOUNT_FILE=/etc/esmaul-husna/sa.json
+
+4. `systemctl restart esmaul-husna`
+
+Notlar: Drive gerçek bir veritabanı değildir. Yazmalar tek tek sıraya alınır, `activity.csv` her olayda baştan yüklenir (binlerce satırdan sonra Supabase'e geçin). Bozuk `progress.json` ilerlemeyi sıfırlamaz, sunucu hata verir. Anahtar dosyası repoya eklenmez.
 
 ## Kaynakça hakkında
 
@@ -71,7 +97,7 @@ CloudPanel kullanılan sunucularda nginx vhost'ları CloudPanel tarafından yön
 ## Bilinen sınırlar (MVP)
 
 - Her isim için yalnızca son tamamlanma tarihi tutulur. Bir ismi bir hafta içinde tamamlayıp sonra geri alırsanız, o haftaki bonus ve rozet hesabı bu değişikliğe göre yeniden yapılır.
-- İlerleme tek kullanıcılıdır. Çok kullanıcılı sürüm için Supabase (PostgreSQL + RLS) önerilir.
+- İlerleme tek kullanıcılıdır (Drive'da da tek `progress.json`). Çok kullanıcılı sürüm için Supabase (PostgreSQL + RLS) önerilir.
 - Sunucu varsayılan olarak yalnızca `127.0.0.1` üzerinde dinler. Dışarı açmadan önce kimlik doğrulama eklenmelidir.
 
 ## Geliştirici

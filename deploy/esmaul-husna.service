@@ -12,6 +12,8 @@ WorkingDirectory=/opt/esmaul-husna
 Environment=NODE_ENV=production
 Environment=PORT=3000
 Environment=HOST=127.0.0.1
+# Optional: STORAGE=drive, DRIVE_FOLDER_ID, GOOGLE_SERVICE_ACCOUNT_FILE (see README). Keep this file chmod 600.
+EnvironmentFile=-/etc/esmaul-husna.env
 ExecStart=/usr/bin/node /opt/esmaul-husna/server.mjs
 Restart=on-failure
 RestartSec=3
