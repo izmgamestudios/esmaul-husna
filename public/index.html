@@ -3,27 +3,78 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Esmaü'l-Hüsna Kılavuzu</title>
+  <title>Esmaü'l-Hüsna Kılavuzu · TEKNODOZ</title>
+  <meta name="description" content="Esmaü'l-Hüsna'yı anlamlandır, yaşa ve takip et. Kaynakçalı, oyunlaştırılmış kılavuz.">
+  <link rel="icon" href="/logo.png">
   <link rel="stylesheet" href="/style.css">
+  <script src="/theme.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Esmaü'l-Hüsna Kılavuzu</h1>
-    <p class="subtitle">Her ismi yaşa, puan kazan, rozet topla.</p>
-  </header>
-  <main>
-    <section id="stats" aria-label="İlerleme"></section>
-    <section aria-labelledby="badges-title">
-      <h2 id="badges-title">Rozetler</h2>
-      <div id="badges" class="badges"></div>
-    </section>
-    <section aria-labelledby="names-title">
-      <h2 id="names-title">İsimler</h2>
-      <nav id="letters" aria-label="Harfe göre filtrele"></nav>
-      <ul id="names" class="names"></ul>
-    </section>
-    <p id="error" role="alert" class="error" hidden></p>
-  </main>
-  <script src="/app.js" defer></script>
+<div class="layout">
+  <aside id="sidebar" class="sidebar" aria-label="Kenar menü">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="/logo.png" alt="TEKNODOZ logosu" class="logo" width="1024" height="548">
+      </div>
+      <p class="beta">Beta · Erken Erişim</p>
+    </div>
+    <nav aria-label="Sayfa bölümleri">
+      <a href="#stats" data-nav>Ana sayfa</a>
+      <a href="#badges" data-nav>Rozetler</a>
+      <a href="#names" data-nav>İsimler</a>
+      <a href="#sources" data-nav>Kaynakça</a>
+      <a href="#credits" data-nav>Krediler</a>
+    </nav>
+    <button id="theme-toggle" type="button" class="btn">Tema</button>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <button id="menu-toggle" type="button" class="btn menu-toggle" aria-expanded="false" aria-controls="sidebar">Menü</button>
+      <div>
+        <h1>Esmaü'l-Hüsna Kılavuzu</h1>
+        <p class="subtitle">Her ismi yaşa, puan kazan, rozet topla.</p>
+      </div>
+    </header>
+
+    <main>
+      <p id="error" role="alert" class="error" hidden></p>
+
+      <section id="stats" aria-label="İlerleme"></section>
+
+      <section id="badges" aria-labelledby="badges-title">
+        <h2 id="badges-title">Rozetler</h2>
+        <div id="badge-grid" class="badges"></div>
+      </section>
+
+      <section id="names" aria-labelledby="names-title">
+        <h2 id="names-title">İsimler</h2>
+        <nav id="letters" aria-label="Harfe göre filtrele"></nav>
+        <ul id="name-list" class="names"></ul>
+      </section>
+
+      <section id="sources" aria-labelledby="sources-title">
+        <h2 id="sources-title">Kaynakça</h2>
+        <p class="notice">Aşağıdaki bağlantılar üçüncü taraf sitelere gider. Bu sitelerin içeriğinden geliştirici sorumlu değildir. Ayet ve hadis bilgilerini her zaman birincil kaynaktan doğrulayın.</p>
+        <div id="source-list"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <section id="credits" aria-labelledby="credits-title">
+        <h2 id="credits-title">Krediler</h2>
+        <p><strong>Hüseyin Bayer</strong> · izmgamestudios · TEKNODOZ</p>
+        <div class="contact-actions">
+          <a class="btn" href="tel:+905417709205">📞 Ara: 0541 770 92 05</a>
+          <a class="btn" href="https://wa.me/905417709205" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>
+          <a class="btn" href="mailto:izmgamestudios@gmail.com">✉️ E-posta</a>
+          <a class="btn" href="https://www.linkedin.com/in/huseyin-bayer-izmgamestudios" target="_blank" rel="noopener noreferrer">in LinkedIn</a>
+        </div>
+        <p class="meta">izmgamestudios@gmail.com</p>
+      </section>
+    </footer>
+  </div>
+</div>
+<script src="/app.js" defer></script>
 </body>
 </html>

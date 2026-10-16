@@ -1,5 +1,5 @@
-// Vanilla JS client. All text is set with textContent, so no HTML injection is possible.
-const state = { names: [], badges: [], completed: {}, stats: null, letter: 'Tümü' };
+// Vanilla JS client. All text is written with textContent, so no HTML injection is possible.
+const state = { names: [], badges: [], sources: [], completed: {}, stats: null, letter: 'Tümü' };
 
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
@@ -24,6 +24,36 @@ async function api(url, options) {
   return data;
 }
 
+/* ---------- Theme ---------- */
+
+function currentTheme() {
+  const explicit = document.documentElement.dataset.theme;
+  if (explicit === 'light' || explicit === 'dark') return explicit;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function renderThemeButton() {
+  const btn = document.getElementById('theme-toggle');
+  const next = currentTheme() === 'dark' ? 'Açık' : 'Koyu';
+  btn.textContent = `${next} temaya geç`;
+}
+
+function toggleTheme() {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('theme', next); } catch { /* storage blocked: keep in-memory only */ }
+  renderThemeButton();
+}
+
+/* ---------- Sidebar (mobile) ---------- */
+
+function setMenu(open) {
+  document.getElementById('sidebar').classList.toggle('open', open);
+  document.getElementById('menu-toggle').setAttribute('aria-expanded', String(open));
+}
+
+/* ---------- Rendering ---------- */
+
 function renderStats() {
   const s = state.stats;
   const next = s.nextLevel
@@ -44,7 +74,7 @@ function renderStats() {
 }
 
 function renderBadges() {
-  document.getElementById('badges').replaceChildren(...state.stats.badges.map((b) =>
+  document.getElementById('badge-grid').replaceChildren(...state.stats.badges.map((b) =>
     el('div', { class: b.earned ? 'badge earned' : 'badge' },
       el('div', { class: 'title' }, b.earned ? `🏅 ${b.name}` : b.name),
       el('div', { class: 'meta' }, `${b.category} · ${b.count}/${b.total}`),
@@ -53,15 +83,13 @@ function renderBadges() {
 
 function renderLetters() {
   const letters = ['Tümü', ...new Set(state.names.map((n) => n.letter))];
-  document.getElementById('letters').replaceChildren(...letters.map((l) => {
-    const btn = el('button', { type: 'button', 'aria-pressed': String(l === state.letter), 'data-letter': l }, l);
-    return btn;
-  }));
+  document.getElementById('letters').replaceChildren(...letters.map((l) =>
+    el('button', { type: 'button', 'aria-pressed': String(l === state.letter), 'data-letter': l }, l)));
 }
 
 function renderNames() {
   const visible = state.letter === 'Tümü' ? state.names : state.names.filter((n) => n.letter === state.letter);
-  document.getElementById('names').replaceChildren(...visible.map((n) => {
+  document.getElementById('name-list').replaceChildren(...visible.map((n) => {
     const done = Boolean(state.completed[n.name]);
     return el('li', { class: done ? 'name done' : 'name' },
       el('button', {
@@ -81,12 +109,34 @@ function renderNames() {
   }));
 }
 
+function renderSources() {
+  const groups = new Map();
+  for (const s of state.sources) {
+    if (!groups.has(s.category)) groups.set(s.category, []);
+    groups.get(s.category).push(s);
+  }
+  const nodes = [];
+  for (const [category, items] of groups) {
+    nodes.push(el('h3', {}, category));
+    nodes.push(el('ul', { class: 'sources' }, ...items.map((s) =>
+      el('li', {},
+        el('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer' }, s.title),
+        el('div', { class: 'meaning' }, s.note),
+      ))));
+  }
+  document.getElementById('source-list').replaceChildren(...nodes);
+}
+
 function render() {
   renderStats();
   renderBadges();
   renderLetters();
   renderNames();
+  renderSources();
+  renderThemeButton();
 }
+
+/* ---------- Data ---------- */
 
 async function load() {
   try {
@@ -111,7 +161,9 @@ async function toggle(name) {
   }
 }
 
-document.getElementById('names').addEventListener('click', (event) => {
+/* ---------- Events ---------- */
+
+document.getElementById('name-list').addEventListener('click', (event) => {
   const btn = event.target.closest('button[data-name]');
   if (btn) toggle(btn.dataset.name);
 });
@@ -123,5 +175,11 @@ document.getElementById('letters').addEventListener('click', (event) => {
   renderLetters();
   renderNames();
 });
+
+document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+document.getElementById('menu-toggle').addEventListener('click', () => {
+  setMenu(!document.getElementById('sidebar').classList.contains('open'));
+});
+document.querySelectorAll('[data-nav]').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
 load();

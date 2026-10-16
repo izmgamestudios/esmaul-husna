@@ -1,0 +1,44 @@
+[
+  {
+    "category": "Kur'an-ı Kerim",
+    "title": "Quran.com: Türkçe meal ve tefsir",
+    "url": "https://quran.com",
+    "note": "Ayetleri meal ve tefsirleriyle birlikte okumak için."
+  },
+  {
+    "category": "Kur'an-ı Kerim",
+    "title": "Diyanet İşleri Başkanlığı: Kur'an-ı Kerim meali",
+    "url": "https://kuran.diyanet.gov.tr",
+    "note": "Resmi Türkçe meal. Bu kılavuzdaki ayet atıfları için birincil kaynak."
+  },
+  {
+    "category": "Hadis",
+    "title": "Sunnah.com: hadis koleksiyonları",
+    "url": "https://sunnah.com",
+    "note": "Hadislerin kaynağını, numarasını ve derecesini kontrol etmek için."
+  },
+  {
+    "category": "Hadis",
+    "title": "Sahih-i Buhari",
+    "url": "https://sunnah.com/bukhari",
+    "note": "\"Allah'ın doksan dokuz ismi vardır\" hadisinin rivayet edildiği koleksiyonlardan biri."
+  },
+  {
+    "category": "Hadis",
+    "title": "Sahih-i Müslim",
+    "url": "https://sunnah.com/muslim",
+    "note": "\"Allah güzeldir, güzeli sever\" hadisinin rivayet edildiği koleksiyonlardan biri."
+  },
+  {
+    "category": "Hadis",
+    "title": "Tirmizi",
+    "url": "https://sunnah.com/tirmidhi",
+    "note": "Esmaü'l-Hüsna'yı sayan rivayetlerden birinin bulunduğu koleksiyon."
+  },
+  {
+    "category": "Kurumsal",
+    "title": "Diyanet İşleri Başkanlığı",
+    "url": "https://www.diyanet.gov.tr",
+    "note": "Resmi dini bilgi ve yayınlar."
+  }
+]

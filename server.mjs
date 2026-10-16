@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseKilavuz, parseBadges } from './lib/parse.mjs';
 import { computeStats, todayIso } from './lib/gamification.mjs';
+import { validateSources } from './lib/sources.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(ROOT, 'data');
@@ -20,6 +21,8 @@ const STATIC_FILES = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
+  '/theme.js': ['theme.js', 'text/javascript; charset=utf-8'],
+  '/logo.png': ['logo.png', 'image/png'],
 };
 
 const CSP = [
@@ -35,6 +38,7 @@ const CSP = [
 const md = await readFile(path.join(DATA_DIR, 'kilavuz.md'), 'utf8');
 const names = parseKilavuz(md);
 const badges = parseBadges(md);
+const sources = validateSources(JSON.parse(await readFile(path.join(DATA_DIR, 'sources.json'), 'utf8')));
 const knownNames = new Set(names.map((n) => n.name));
 
 /** Keep only known names and valid dates, so stale or tampered data is dropped. */
@@ -70,6 +74,7 @@ function snapshot(progress) {
   return {
     names,
     badges,
+    sources,
     completed: progress.completed,
     stats: computeStats({
       names,
@@ -161,5 +166,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`Esmaü'l-Hüsna uygulaması: http://${HOST}:${PORT}`);
-  console.log(`${names.length} isim, ${badges.length} rozet yüklendi.`);
+  console.log(`${names.length} isim, ${badges.length} rozet, ${sources.length} kaynak yüklendi.`);
 });

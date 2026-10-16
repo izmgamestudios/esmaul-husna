@@ -7,6 +7,6 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test test/parse.test.mjs test/gamification.test.mjs"
+    "test": "node --test test/parse.test.mjs test/gamification.test.mjs test/sources.test.mjs"
   }
 }
